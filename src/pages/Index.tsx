@@ -1,461 +1,326 @@
 
-import { useState } from 'react';
-import { Brain, Heart, Headphones, BarChart3, Users, Menu, X, ArrowRight, Zap, Shield, Globe, Sparkles, Cpu, Database, MessageSquare, Video, Mic, Star, Award, Infinity, Play } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import KnowledgeAI from '@/components/modules/KnowledgeAI';
-import HealthAI from '@/components/modules/HealthAI';
-import SupportAI from '@/components/modules/SupportAI';
-import InsightsAI from '@/components/modules/InsightsAI';
-import TalentAI from '@/components/modules/TalentAI';
+import { 
+  Brain, 
+  Heart, 
+  MessageSquare, 
+  BarChart3, 
+  Users, 
+  Settings,
+  Sparkles,
+  Zap,
+  Shield,
+  ChevronRight,
+  ArrowRight
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useUser } from '@/contexts/UserContext';
+import { useNotifications } from '@/contexts/NotificationContext';
+import VoiceProcessor from '@/components/VoiceProcessor';
+import AnimatedHero from '@/components/AnimatedHero';
+import EnhancedLoader from '@/components/EnhancedLoader';
 
-const Index = () => {
-  const [activeModule, setActiveModule] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const Index: React.FC = () => {
+  const { user, isAuthenticated } = useUser();
+  const { addNotification } = useNotifications();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const modules = [
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const aiModules = [
     {
       id: 'knowledge',
-      name: 'Knowledge AI',
+      title: 'Knowledge AI',
+      description: 'Advanced knowledge processing and information retrieval system',
       icon: Brain,
-      description: 'Upload docs, PDFs, policies - AI-powered embeddings with RAG',
       color: 'from-purple-500 to-indigo-600',
-      component: KnowledgeAI,
-      features: ['LangChain Integration', 'RAG Processing', 'Document Analysis', 'AI Embeddings']
+      path: '/knowledge',
+      features: ['Natural Language Processing', 'Document Analysis', 'Smart Search']
     },
     {
       id: 'health',
-      name: 'Health AI',
+      title: 'Health AI',
+      description: 'Intelligent health analytics and medical insights platform',
       icon: Heart,
-      description: 'Medical diagnostics, report analysis, risk assessments',
       color: 'from-red-500 to-pink-600',
-      component: HealthAI,
-      features: ['Medical Diagnostics', 'Scan Analysis', 'Risk Assessment', 'Health Monitoring']
+      path: '/health',
+      features: ['Health Monitoring', 'Predictive Analytics', 'Medical Insights']
     },
     {
       id: 'support',
-      name: 'Support AI',
-      icon: Headphones,
-      description: 'Voice-to-text, AI replies, sentiment analysis, chatbot integration',
-      color: 'from-green-500 to-emerald-600',
-      component: SupportAI,
-      features: ['Voice Recognition', 'Real-time Chat', 'Sentiment Analysis', 'Call Center AI']
+      title: 'Support AI',
+      description: 'Smart customer support and automated assistance system',
+      icon: MessageSquare,
+      color: 'from-blue-500 to-cyan-600',
+      path: '/support-ai',
+      features: ['24/7 Support', 'Intelligent Routing', 'Auto-Resolution']
     },
     {
       id: 'insights',
-      name: 'Insights AI',
+      title: 'Insights AI',
+      description: 'Business intelligence and data analytics platform',
       icon: BarChart3,
-      description: 'BI dashboards with AI-powered natural language querying',
-      color: 'from-blue-500 to-cyan-600',
-      component: InsightsAI,
-      features: ['Natural Language BI', 'Predictive Analytics', 'Live Dashboards', 'AI Forecasting']
+      color: 'from-green-500 to-emerald-600',
+      path: '/insights',
+      features: ['Data Visualization', 'Trend Analysis', 'Predictive Modeling']
     },
     {
       id: 'talent',
-      name: 'Talent AI',
+      title: 'Talent AI',
+      description: 'HR analytics and talent management system',
       icon: Users,
-      description: 'Resume parsing, AI job matching, live skill assessments',
-      color: 'from-orange-500 to-yellow-600',
-      component: TalentAI,
-      features: ['Resume Parsing', 'AI Job Matching', 'Live Coding Tests', 'Video Interviews']
+      color: 'from-orange-500 to-red-600',
+      path: '/talent',
+      features: ['Talent Acquisition', 'Performance Analytics', 'Career Development']
     }
   ];
 
-  const megaFeatures = [
-    {
-      icon: MessageSquare,
-      title: 'AI Chatbot Integration',
-      description: 'Context-aware conversational AI across all modules with voice & text support',
-      gradient: 'from-purple-500 to-pink-500',
-      action: () => console.log('Opening AI Chatbot Demo'),
-      actionText: 'Try Demo'
-    },
-    {
-      icon: Cpu,
-      title: 'Advanced ML Pipeline',
-      description: 'GPT-4, Gemini Pro, LangChain, Whisper integration with custom ML models',
-      gradient: 'from-blue-500 to-cyan-500',
-      action: () => console.log('Opening ML Pipeline Dashboard'),
-      actionText: 'View Pipeline'
-    },
-    {
-      icon: Database,
-      title: 'Intelligent Data Processing',
-      description: 'Vector databases, PostgreSQL, MongoDB with real-time analytics',
-      gradient: 'from-green-500 to-emerald-500',
-      action: () => console.log('Opening Data Dashboard'),
-      actionText: 'View Data'
-    },
-    {
-      icon: Video,
-      title: 'Multi-Modal AI',
-      description: 'Voice, video, text, and document processing with WebRTC integration',
-      gradient: 'from-orange-500 to-red-500',
-      action: () => console.log('Opening Multi-Modal Interface'),
-      actionText: 'Try Now'
-    },
-    {
-      icon: Infinity,
-      title: 'Infinite Scalability',
-      description: 'Enterprise-grade architecture with global CDN and auto-scaling',
-      gradient: 'from-indigo-500 to-purple-500',
-      action: () => console.log('Opening Scalability Metrics'),
-      actionText: 'View Metrics'
-    },
-    {
-      icon: Award,
-      title: 'Role-Based Intelligence',
-      description: 'Specialized AI for doctors, recruiters, support managers, and employees',
-      gradient: 'from-yellow-500 to-orange-500',
-      action: () => console.log('Opening Role Configuration'),
-      actionText: 'Configure'
-    }
-  ];
-
-  const ActiveComponent = activeModule ? modules.find(m => m.id === activeModule)?.component : null;
-
-  const handleModuleClick = (moduleId: string) => {
-    console.log(`Opening ${moduleId} module`);
-    setActiveModule(moduleId);
+  const handleModuleClick = (module: typeof aiModules[0]) => {
+    addNotification({
+      type: 'info',
+      title: `${module.title} Activated`,
+      message: `Loading ${module.title} module with enhanced features...`
+    });
   };
 
-  const scrollToModules = () => {
-    const modulesSection = document.getElementById('modules-section');
-    if (modulesSection) {
-      modulesSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  if (activeModule && ActiveComponent) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-700">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveModule(null)}
-                className="text-slate-300 hover:text-white hover:bg-slate-800"
-              >
-                ← Back to Suite
-              </Button>
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 rounded-lg flex items-center justify-center relative">
-                  <Infinity className="w-4 h-4 text-white" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
-                </div>
-                <span className="text-white font-bold">Saha's Infinetix</span>
-              </div>
-            </div>
-            <div className="text-slate-300 text-sm">
-              {modules.find(m => m.id === activeModule)?.name}
-            </div>
-          </div>
-        </div>
-        <div className="pt-20">
-          <ActiveComponent />
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <EnhancedLoader variant="advanced" message="Initializing Infinetix AI Suite" />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/4 w-48 h-48 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-32 h-32 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full blur-3xl animate-pulse delay-2000"></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Animated Hero Section */}
+      <AnimatedHero />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
-                  <Infinity className="w-5 h-5 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">
-                  Saha's Infinetix
-                </h1>
-                <p className="text-xs text-slate-400">EnterpriseX AI Suite</p>
-              </div>
-            </div>
+      {/* Quick Navigation */}
+      <motion.section
+        className="py-16 px-6"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-4 mb-12">
+            <Link to="/about">
+              <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700 hover:border-purple-500/50 transition-all duration-300 cursor-pointer group">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <Sparkles className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-2">About Us</h3>
+                  <p className="text-slate-400 text-sm">Learn our story</p>
+                </CardContent>
+              </Card>
+            </Link>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-6">
-              <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-800">Enterprise</Button>
-              <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-800">Solutions</Button>
-              <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-800">Support</Button>
-              <Button className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
-                Get Started
-              </Button>
-            </div>
+            <Link to="/services">
+              <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700 hover:border-purple-500/50 transition-all duration-300 cursor-pointer group">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <Zap className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-2">Services</h3>
+                  <p className="text-slate-400 text-sm">AI Solutions</p>
+                </CardContent>
+              </Card>
+            </Link>
 
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden text-slate-300 hover:text-white hover:bg-slate-800"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              {sidebarOpen ? <X /> : <Menu />}
-            </Button>
+            <Link to="/features">
+              <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700 hover:border-purple-500/50 transition-all duration-300 cursor-pointer group">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <Brain className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-2">Features</h3>
+                  <p className="text-slate-400 text-sm">Technology</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to={isAuthenticated ? "/dashboard" : "/login"}>
+              <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700 hover:border-purple-500/50 transition-all duration-300 cursor-pointer group">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <ArrowRight className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-2">
+                    {isAuthenticated ? "Dashboard" : "Get Started"}
+                  </h3>
+                  <p className="text-slate-400 text-sm">
+                    {isAuthenticated ? "Your portal" : "Join us"}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
-      </nav>
-
-      {/* Mobile Sidebar */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)}></div>
-          <div className="fixed right-0 top-0 h-full w-64 bg-slate-900 border-l border-slate-700 p-6 pt-20">
-            <div className="space-y-4">
-              <Button variant="ghost" className="w-full text-left justify-start text-slate-300 hover:text-white hover:bg-slate-800">Enterprise</Button>
-              <Button variant="ghost" className="w-full text-left justify-start text-slate-300 hover:text-white hover:bg-slate-800">Solutions</Button>
-              <Button variant="ghost" className="w-full text-left justify-start text-slate-300 hover:text-white hover:bg-slate-800">Support</Button>
-              <Button className="w-full bg-gradient-to-r from-purple-600 to-cyan-600">Get Started</Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 relative">
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center space-x-2 bg-slate-800/50 rounded-full px-4 py-2 mb-8 border border-slate-700">
-            <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-            <span className="text-sm text-slate-300">EnterpriseX AI Suite</span>
-            <Badge className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-xs">Beta 2.0</Badge>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">
-              One Suite.
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent">
-              Total AI Intelligence.
-            </span>
-            <br />
-            <span className="text-2xl md:text-4xl bg-gradient-to-r from-slate-400 to-slate-300 bg-clip-text text-transparent">
-              Infinite Possibilities.
-            </span>
-          </h1>
-          
-          <p className="text-xl text-slate-300 mb-8 max-w-4xl mx-auto leading-relaxed">
-            Saha's Infinetix delivers next-generation AI technology that seamlessly integrates across knowledge, 
-            healthcare, support, analytics, and talent management. One platform for infinite enterprise possibilities.
-          </p>
-
-          {/* Founder Info */}
-          <div className="mb-12 p-6 bg-slate-800/30 rounded-2xl border border-slate-700 max-w-2xl mx-auto">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" />
-              </div>
-              <div className="text-left">
-                <h3 className="text-lg font-bold text-white">Sahayoheshwaran</h3>
-                <p className="text-slate-400 text-sm">Founder & CEO</p>
-              </div>
-            </div>
-            <p className="text-slate-300 text-sm italic">
-              "Empowering enterprises with AI that understands, adapts, and transforms business intelligence."
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 text-lg px-8 py-3"
-              onClick={scrollToModules}
-            >
-              Explore Modules
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white text-lg px-8 py-3"
-              onClick={() => console.log('Opening demo video')}
-            >
-              <Video className="mr-2 w-5 h-5" />
-              Watch Demo
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Mega Features Section */}
-      <section className="py-20 px-6 bg-slate-800/20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Mega AI Features
-            </h2>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Revolutionary AI capabilities that redefine enterprise intelligence
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {megaFeatures.map((feature, index) => {
-              const IconComponent = feature.icon;
-              return (
-                <Card
-                  key={index}
-                  className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-all duration-300 hover:scale-105 group cursor-pointer"
-                  onClick={feature.action}
-                >
-                  <CardHeader>
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    <CardTitle className="text-white text-xl">{feature.title}</CardTitle>
-                    <CardDescription className="text-slate-400 mb-4">
-                      {feature.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white group-hover:border-slate-500"
-                    >
-                      <Play className="mr-2 w-4 h-4" />
-                      {feature.actionText}
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      </motion.section>
 
       {/* AI Modules Grid */}
-      <section id="modules-section" className="py-20 px-6">
+      <motion.section
+        className="py-20 px-6"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              AI Modules
+            <Badge className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-purple-500/30 text-cyan-300 mb-4">
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI-Powered Solutions
+            </Badge>
+            <h2 className="text-5xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent mb-6">
+              Choose Your AI Module
             </h2>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Specialized AI solutions for every department and business function
+            <p className="text-xl text-slate-400 max-w-3xl mx-auto">
+              Each module is designed with cutting-edge AI technology to provide intelligent solutions for your specific needs.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {modules.map((module) => {
-              const IconComponent = module.icon;
-              return (
-                <Card
-                  key={module.id}
-                  className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-all duration-300 hover:scale-105 cursor-pointer group relative overflow-hidden"
-                  onClick={() => handleModuleClick(module.id)}
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-r ${module.color} opacity-0 group-hover:opacity-10 transition-opacity`}></div>
-                  <CardHeader className="relative z-10">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${module.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                      <IconComponent className="w-6 h-6 text-white" />
+            {aiModules.map((module, index) => (
+              <motion.div
+                key={module.id}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05, y: -10 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700 hover:border-purple-500/50 transition-all duration-300 h-full group">
+                  <CardHeader className="pb-4">
+                    <div className={`w-16 h-16 bg-gradient-to-r ${module.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      <module.icon className="w-8 h-8 text-white" />
                     </div>
-                    <CardTitle className="text-white text-xl">{module.name}</CardTitle>
-                    <CardDescription className="text-slate-400 mb-4">
+                    <CardTitle className="text-white text-xl mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 group-hover:bg-clip-text transition-all duration-300">
+                      {module.title}
+                    </CardTitle>
+                    <p className="text-slate-400 text-sm leading-relaxed">
                       {module.description}
-                    </CardDescription>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {module.features.map((feature, index) => (
-                        <Badge key={index} variant="outline" className="border-slate-600 text-slate-300 text-xs">
+                    </p>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2 mb-6">
+                      {module.features.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-center text-slate-300 text-sm">
+                          <div className="w-1.5 h-1.5 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full mr-3" />
                           {feature}
-                        </Badge>
+                        </div>
                       ))}
                     </div>
-                  </CardHeader>
-                  <CardContent className="relative z-10">
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white group-hover:border-slate-500"
-                    >
-                      Launch Module
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                    <Link to={module.path}>
+                      <Button
+                        className="w-full bg-gradient-to-r from-slate-700 to-slate-600 hover:from-purple-600 hover:to-cyan-600 text-white border-0 group-hover:shadow-lg group-hover:shadow-purple-500/25 transition-all duration-300"
+                        onClick={() => handleModuleClick(module)}
+                      >
+                        Launch Module
+                        <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
-              );
-            })}
+              </motion.div>
+            ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Enterprise Features Section */}
-      <section className="py-20 px-6 bg-slate-800/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Enterprise Features
+      {/* Voice Commands Section */}
+      <motion.section
+        className="py-20 px-6"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Voice-Controlled AI
             </h2>
-            <p className="text-xl text-slate-400">Built for scale, security, and seamless integration</p>
+            <p className="text-slate-400 text-lg">
+              Control your AI experience with natural voice commands
+            </p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 text-white">Enterprise Security</h3>
-              <p className="text-slate-400">
-                SSO, SAML, OAuth 2.0, role-based access control with enterprise-grade encryption and audit trails
-              </p>
-            </div>
-
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <Cpu className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 text-white">Advanced AI Pipeline</h3>
-              <p className="text-slate-400">
-                GPT-4, Gemini Pro, LangChain, Whisper, and custom ML models with PyTorch & TensorFlow integration
-              </p>
-            </div>
-
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <Globe className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 text-white">Global Intelligence</h3>
-              <p className="text-slate-400">
-                Multi-tenant architecture, global CDN, 99.9% uptime, and multilingual AI support
-              </p>
-            </div>
+          
+          <div className="flex justify-center">
+            <VoiceProcessor />
           </div>
         </div>
-      </section>
+      </motion.section>
+
+      {/* Admin Dashboard Link */}
+      {user?.role === 'admin' && (
+        <motion.section
+          className="py-20 px-6"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="max-w-4xl mx-auto text-center">
+            <Card className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 border-slate-600">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl flex items-center justify-center">
+                    <Shield className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">Admin Dashboard</h3>
+                <p className="text-slate-300 mb-6">
+                  Access advanced system controls and analytics
+                </p>
+                <Link to="/admin">
+                  <Button className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Access Dashboard
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.section>
+      )}
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-slate-700">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 rounded-lg flex items-center justify-center">
-                <Infinity className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <span className="text-white font-bold">Saha's Infinetix</span>
-                <p className="text-xs text-slate-400">EnterpriseX AI Suite by Sahayoheshwaran</p>
-              </div>
+      <footer className="border-t border-slate-800 py-12 px-6">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-xl flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <div className="text-slate-400 text-sm text-center md:text-right">
-              <p>© 2025 Saha's Infinetix. All rights reserved.</p>
-              <p className="text-xs mt-1">Founded by Sahayoheshwaran • Enterprise AI Intelligence</p>
-            </div>
+            <span className="text-white font-bold text-xl ml-3">Sahayogeshwaran AI</span>
+          </div>
+          <p className="text-slate-400 mb-4">
+            Empowering the future with intelligent AI solutions
+          </p>
+          <div className="flex justify-center space-x-6">
+            <Link to="/settings" className="text-slate-400 hover:text-white transition-colors">
+              Settings
+            </Link>
+            <Link to="/support" className="text-slate-400 hover:text-white transition-colors">
+              Support
+            </Link>
+            <Link to="/notifications" className="text-slate-400 hover:text-white transition-colors">
+              Notifications
+            </Link>
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="text-slate-400 hover:text-white transition-colors">
+                Admin
+              </Link>
+            )}
           </div>
         </div>
       </footer>
